@@ -3,9 +3,8 @@ import { SpeechDetectionModel } from "./SpeechDetectionModel";
 // constants
 import { audioWorkletNodeOptions } from "./constants";
 import ts from "typescript";
-//workers
 // @ts-ignore
-// import tsFileContent from "../../packages/VoiceActiveDetection/worker/worklet";
+import tsFileContent from "./Worklet/worklet";
 
 // types
 import {
@@ -15,7 +14,20 @@ import {
   Log,
 } from "./types";
 
-const WORKLET_URL = "";
+const transpileOptions = {
+  compilerOptions: {
+    removeComments: true, // Remove comments
+  },
+};
+
+const workletCode = ts.transpileModule(
+  tsFileContent,
+  transpileOptions
+).outputText;
+
+const WorkletBlob = new Blob([workletCode], { type: "application/javascript" });
+
+const WORKLET_URL = URL.createObjectURL(WorkletBlob);
 
 export class AudioAnalyzer {
   public audioContext: AudioContext;
