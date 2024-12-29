@@ -2,10 +2,6 @@ import { FrameProcessor } from "./FrameProcessor";
 import { SpeechDetectionModel } from "./SpeechDetectionModel";
 // constants
 import { audioWorkletNodeOptions } from "./constants";
-import ts from "typescript";
-//workers
-// @ts-ignore
-// import tsFileContent from "../../packages/VoiceActiveDetection/worker/worklet";
 
 // types
 import {
@@ -15,7 +11,8 @@ import {
   Log,
 } from "./types";
 
-const WORKLET_URL = "";
+const WORKLET_URL =
+  "http://localhost:3000/_next/static/chunks/pages/AudioResamplerWorklet.js";
 
 export class AudioAnalyzer {
   public audioContext: AudioContext;
