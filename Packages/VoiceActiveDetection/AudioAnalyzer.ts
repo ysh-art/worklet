@@ -2,10 +2,7 @@ import { FrameProcessor } from "./FrameProcessor";
 import { SpeechDetectionModel } from "./SpeechDetectionModel";
 // constants
 import { audioWorkletNodeOptions } from "./constants";
-import ts from "typescript";
-//workers
-// @ts-ignore
-// import tsFileContent from "../../packages/VoiceActiveDetection/worker/worklet";
+import { AudioWorklet } from "./Worklet/AudioWorklet";
 
 // types
 import {
@@ -14,8 +11,6 @@ import {
   SpeechProbabilities,
   Log,
 } from "./types";
-
-const WORKLET_URL = "";
 
 export class AudioAnalyzer {
   public audioContext: AudioContext;
@@ -33,7 +28,11 @@ export class AudioAnalyzer {
 
   init = async () => {
     try {
-      await this.audioContext.audioWorklet.addModule(WORKLET_URL);
+      // @ts-ignore
+      const workerURL = new AudioWorklet(
+        new URL("./Worklet/worklet.ts", import.meta.url)
+      );
+      await this.audioContext.audioWorklet.addModule(workerURL);
     } catch (e) {
       this.log.error(`Encountered an error while loading worklet.`);
     }
