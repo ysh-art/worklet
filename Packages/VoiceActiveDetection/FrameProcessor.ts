@@ -1,5 +1,5 @@
 // constants
-import { DEFAULT_FRAMEPROCESSOR_OPTIONS } from './constants';
+import { DEFAULT_FRAMEPROCESSOR_OPTIONS } from "./constants";
 
 // types
 import {
@@ -8,7 +8,7 @@ import {
   MESSAGE,
   SpeechProbabilities,
   SpeechConfidenceFramesInterface,
-} from './types';
+} from "./types";
 
 export class FrameProcessor implements FrameProcessorInterface {
   private speaking = false;
@@ -19,7 +19,9 @@ export class FrameProcessor implements FrameProcessorInterface {
 
   private options: FrameProcessorOptions;
 
-  private predictSpeechPresence: (frame: Float32Array) => Promise<SpeechProbabilities>;
+  private predictSpeechPresence: (
+    frame: Float32Array
+  ) => Promise<SpeechProbabilities>;
 
   private modelReset: () => void;
 
@@ -27,7 +29,9 @@ export class FrameProcessor implements FrameProcessorInterface {
     predictSpeechPresence,
     modelReset,
   }: {
-    predictSpeechPresence: (frame: Float32Array) => Promise<SpeechProbabilities>;
+    predictSpeechPresence: (
+      frame: Float32Array
+    ) => Promise<SpeechProbabilities>;
     modelReset: () => void;
   }) {
     this.predictSpeechPresence = predictSpeechPresence;
@@ -48,16 +52,19 @@ export class FrameProcessor implements FrameProcessorInterface {
 
     this.speechConfidenceFrames.push({
       frame,
-      isSpeech: speechProbability.isSpeech >= this.options.POSITIVE_SPEECH_THRESHOLD,
+      isSpeech:
+        speechProbability.isSpeech >= this.options.POSITIVE_SPEECH_THRESHOLD,
     });
 
-    if (speechProbability.isSpeech >= this.options.POSITIVE_SPEECH_THRESHOLD && this.redemptionCounter) {
+    if (speechProbability.isSpeech >= this.options.POSITIVE_SPEECH_THRESHOLD) {
       this.redemptionCounter = 0;
-    }
 
-    if (speechProbability.isSpeech >= this.options.POSITIVE_SPEECH_THRESHOLD && !this.speaking) {
-      this.speaking = true;
-      return { speechProbability, msg: MESSAGE.SPEECH_START, frame };
+      if (!this.speaking) {
+        this.speaking = true;
+        return { speechProbability, msg: MESSAGE.SPEECH_START, frame };
+      } else {
+        return { speechProbability, frame };
+      }
     }
 
     this.redemptionCounter += 1;
@@ -73,7 +80,10 @@ export class FrameProcessor implements FrameProcessorInterface {
       const speechConfidenceFrames = this.speechConfidenceFrames;
       this.speechConfidenceFrames = [];
 
-      const speechFrameCount = speechConfidenceFrames.reduce((acc, item) => acc + +item.isSpeech, 0);
+      const speechFrameCount = speechConfidenceFrames.reduce(
+        (acc, item) => acc + +item.isSpeech,
+        0
+      );
 
       if (speechFrameCount >= this.options.MIN_SPEECH_FRAMES) {
         return { speechProbability, msg: MESSAGE.SPEECH_END, frame };
@@ -83,7 +93,9 @@ export class FrameProcessor implements FrameProcessorInterface {
     }
 
     if (!this.speaking) {
-      while (this.speechConfidenceFrames.length > this.options.PRE_SPEECH_PAD_FRAMES) {
+      while (
+        this.speechConfidenceFrames.length > this.options.PRE_SPEECH_PAD_FRAMES
+      ) {
         this.speechConfidenceFrames.shift();
       }
     }
