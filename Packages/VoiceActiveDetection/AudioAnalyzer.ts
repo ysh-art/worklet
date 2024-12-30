@@ -16,6 +16,7 @@ import {
 
 const transpileOptions = {
   compilerOptions: {
+    target: "ES2015",
     removeComments: true, // Remove comments
   },
 };
