@@ -1,5 +1,6 @@
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
+const fg = require("fast-glob");
 
 const nextConfig = {
   webpack: (config: any, { isServer }: { isServer: boolean }) => {
@@ -12,14 +13,13 @@ const nextConfig = {
 
     config.plugins.push(
       new CopyPlugin({
-        patterns: [
-          {
-            from: './Packages/VoiceActiveDetection/Worklet/AudioResamplerWorklet.js',
-            to: 'static/chunks/pages',
-          },
-        ],
+        patterns: fg.sync('**/AudioResamplerWorklet.js').map((filePath: any) => ({
+          from: filePath,
+          to: 'static/chunks/pages',
+        })),
       })
     );
+
 
     return config;
   },
